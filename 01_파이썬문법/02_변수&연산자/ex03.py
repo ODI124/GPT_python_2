@@ -1,0 +1,9 @@
+A = 10
+A += 1
+print("A += 1 :",A)
+A -= 1
+print("A -= 1 :", A)
+A *= 1
+print("A *= 1 :", A)
+A /= 1
+print("A /= 1 :", A)
