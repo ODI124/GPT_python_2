@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>점심 메뉴 추천 사이트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #FFFFFF;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 720px;
+            height: 1024px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            padding: 10px;
+            border: 1px solid #000000;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 400;
+            color: #000000;
+            text-align: center;
+            line-height: 1.21;
+        }
+
+        .menu-image {
+            width: 360px;
+            height: 240px;
+            background-color: #f0f0f0;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240"><rect width="360" height="240" fill="%23e0e0e0"/><text x="50%" y="50%" font-family="Arial" font-size="18" fill="%23666" text-anchor="middle" dy=".3em">🍔 햄버거</text></svg>');
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            box-shadow: 0px 5px 5px 0px rgba(0, 0, 0, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .menu-image.loading {
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 240"><rect width="360" height="240" fill="%23f0f0f0"/><text x="50%" y="50%" font-family="Arial" font-size="18" fill="%23999" text-anchor="middle" dy=".3em">메뉴를 찾는 중...</text></svg>');
+        }
+
+        .menu-name {
+            width: 253px;
+            height: 56px;
+            font-size: 32px;
+            font-weight: 400;
+            color: #000000;
+            text-align: center;
+            line-height: 1.21;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .recommend-button {
+            width: 360px;
+            height: 60px;
+            background-color: #0C4DF3;
+            border: none;
+            border-radius: 10px;
+            color: #FFFFFF;
+            font-size: 20px;
+            font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .recommend-button:hover {
+            background-color: #0A3DD6;
+            transform: translateY(-2px);
+        }
+
+        .recommend-button:active {
+            transform: translateY(0);
+        }
+
+        .recommend-button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .menu-emoji {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                height: auto;
+                min-height: 100vh;
+                border: none;
+            }
+            
+            .menu-image {
+                width: 300px;
+                height: 200px;
+            }
+            
+            .recommend-button {
+                width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">오늘 점심은?</h1>
+        
+        <div class="menu-image" id="menuImage">
+            <div class="menu-emoji" id="menuEmoji">🍔</div>
+        </div>
+        
+        <div class="menu-name" id="menuName">햄버거</div>
+        
+        <button class="recommend-button" id="recommendBtn">
+            <span>랜덤 추천</span>
+        </button>
+    </div>
+
+    <script>
+        // 점심 메뉴 데이터
+        const lunchMenus = [
+            { name: '햄버거', emoji: '🍔', color: '#FFE4B5' },
+            { name: '피자', emoji: '🍕', color: '#FFB6C1' },
+            { name: '치킨', emoji: '🍗', color: '#F0E68C' },
+            { name: '짜장면', emoji: '🍜', color: '#DDA0DD' },
+            { name: '김치찌개', emoji: '🍲', color: '#FFA07A' },
+            { name: '비빔밥', emoji: '🍚', color: '#98FB98' },
+            { name: '불고기', emoji: '🥩', color: '#F4A460' },
+            { name: '초밥', emoji: '🍣', color: '#B0E0E6' },
+            { name: '파스타', emoji: '🍝', color: '#FFEFD5' },
+            { name: '돈까스', emoji: '🍛', color: '#D3D3D3' },
+            { name: '라면', emoji: '🍜', color: '#FFE4E1' },
+            { name: '샐러드', emoji: '🥗', color: '#90EE90' },
+            { name: '타코', emoji: '🌮', color: '#FFDEAA' },
+            { name: '샌드위치', emoji: '🥪', color: '#F5DEB3' },
+            { name: '국밥', emoji: '🍲', color: '#E6E6FA' },
+            { name: '칼국수', emoji: '🍜', color: '#F0F8FF' },
+            { name: '보쌈', emoji: '🥓', color: '#FFE4CC' },
+            { name: '족발', emoji: '🦶', color: '#DDBEA9' },
+            { name: '회', emoji: '🐟', color: '#E0F6FF' },
+            { name: '갈비', emoji: '🍖', color: '#FFCCCB' }
+        ];
+
+        let isRecommending = false;
+
+        // 요소들 가져오기
+        const menuImage = document.getElementById('menuImage');
+        const menuEmoji = document.getElementById('menuEmoji');
+        const menuName = document.getElementById('menuName');
+        const recommendBtn = document.getElementById('recommendBtn');
+
+        // 메뉴 업데이트 함수
+        function updateMenu(menu) {
+            menuEmoji.textContent = menu.emoji;
+            menuName.textContent = menu.name;
+            menuImage.style.backgroundColor = menu.color;
+        }
+
+        // 랜덤 추천 함수
+        function recommendRandomMenu() {
+            if (isRecommending) return;
+            
+            isRecommending = true;
+            recommendBtn.disabled = true;
+            recommendBtn.innerHTML = '<span>추천 중...</span>';
+            menuImage.classList.add('loading');
+
+            // 랜덤 애니메이션 효과
+            let counter = 0;
+            const animationInterval = setInterval(() => {
+                const randomMenu = lunchMenus[Math.floor(Math.random() * lunchMenus.length)];
+                updateMenu(randomMenu);
+                counter++;
+
+                if (counter >= 10) {
+                    clearInterval(animationInterval);
+                    
+                    // 최종 메뉴 선택
+                    setTimeout(() => {
+                        const finalMenu = lunchMenus[Math.floor(Math.random() * lunchMenus.length)];
+                        updateMenu(finalMenu);
+                        
+                        menuImage.classList.remove('loading');
+                        recommendBtn.disabled = false;
+                        recommendBtn.innerHTML = '<span>다시 추천</span>';
+                        isRecommending = false;
+
+                        // 성공 효과
+                        menuImage.style.transform = 'scale(1.05)';
+                        setTimeout(() => {
+                            menuImage.style.transform = 'scale(1)';
+                        }, 200);
+
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        // 버튼 클릭 이벤트
+        recommendBtn.addEventListener('click', recommendRandomMenu);
+
+        // 키보드 이벤트 (스페이스바로도 추천 가능)
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space' && !isRecommending) {
+                event.preventDefault();
+                recommendRandomMenu();
+            }
+        });
+
+        // 초기 메뉴 설정
+        updateMenu(lunchMenus[0]);
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>랜덤 상품 페이지</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+        }
+
+        .main-container {
+            width: 1440px;
+            height: 1024px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .product-section {
+            width: 600px;
+            height: 1024px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 1px solid #0F0000;
+        }
+
+        .main-title {
+            width: 482px;
+            height: 116px;
+            font-size: 36px;
+            line-height: 1.21em;
+            text-align: center;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image {
+            width: 451px;
+            height: 311px;
+            object-fit: cover;
+        }
+
+        .product-name {
+            width: 473px;
+            height: 98px;
+            font-size: 24px;
+            line-height: 1.21em;
+            text-align: center;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .random-button {
+            width: 254px;
+            height: 74px;
+            background-color: #00D7CC;
+            border: none;
+            border-radius: 20px;
+            font-size: 31px;
+            line-height: 1.21em;
+            color: #FFFFFF;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .random-button:hover {
+            background-color: #00beb4;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="product-section">
+            <h1 class="main-title">메인 화면</h1>
+            <img id="productImage" class="product-image" src="" alt="상품 이미지">
+            <div id="productName" class="product-name">상품 이름</div>
+            <button class="random-button" onclick="getRandomProduct()">랜덤 버튼</button>
+        </div>
+    </div>
+    <script>
+        async function getRandomProduct() {
+            try {
+                const response = await fetch('/get_random_product');
+                const data = await response.json();
+                document.getElementById('productImage').src = data.image;
+                document.getElementById('productName').textContent = data.name;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 페이지 로드 시 첫 상품 표시
+        window.onload = getRandomProduct;
+    </script>
+</body>
+</html>
